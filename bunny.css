@@ -1,0 +1,307 @@
+/* bunny.css - new mascot styles + every bunny animation. Animates ONLY transform-type props
+   (translate / rotate / scale / transform) and opacity. Palette = 5 CSS variables per bunny. */
+:root{--bn-io:cubic-bezier(.45,0,.25,1);--bn-spr:cubic-bezier(.34,1.56,.64,1);--bn-out:cubic-bezier(.22,1,.36,1);--bn-in:cubic-bezier(.5,0,.9,.4)}
+
+/* ===== palettes: light=belly/inner ear, body=fur, shade=under-ear/arm/tail, cheek=blush, ink=eyes/mouth ===== */
+.bn-pink{--bn-light:#ffbee1;--bn-body:#ff7da5;--bn-shade:#e56e9a;--bn-cheek:#ff468c;--bn-ink:#3c1e00}
+.bn-butter{--bn-light:#fff1b8;--bn-body:#ffd84d;--bn-shade:#f2b92e;--bn-cheek:#ff8f6b;--bn-ink:#3c1e00;--bn-ear:#ffa94d}
+.bn-mint{--bn-light:#d9fbe7;--bn-body:#6ee0a8;--bn-shade:#46c288;--bn-cheek:#ff6f8f;--bn-ink:#1f3b2d}
+.bn-sky{--bn-light:#dbf0ff;--bn-body:#70c4ff;--bn-shade:#46a4ec;--bn-cheek:#ff7ba3;--bn-ink:#1f2a4d}
+.bn-lilac{--bn-light:#f1e4ff;--bn-body:#b99cff;--bn-shade:#977af0;--bn-cheek:#ff7dbf;--bn-ink:#2d2150}
+.bn-cocoa{--bn-light:#f0dcc8;--bn-body:#b07a52;--bn-shade:#8c5a37;--bn-cheek:#ff7f66;--bn-ink:#2b1408}
+
+/* palette chip (profile sheet 36px, onboarding 64px) */
+.bnchip{display:block;position:relative;width:var(--cs,36px);height:var(--cs,36px);border-radius:50%;background:var(--bn-body);box-shadow:inset 0 0 0 2px rgba(0,0,0,.08);margin:auto}
+.bnchip i{position:absolute;right:14%;bottom:14%;width:34%;height:34%;border-radius:50%;background:var(--bn-light)}
+.sel .bnchip{animation:bnChipHop 1.5s var(--bn-io) infinite}
+button:active .bnchip{scale:.92}
+
+/* ===== structure ===== */
+.bun{display:block;overflow:visible;transform-origin:50% 100%;-webkit-tap-highlight-color:transparent}
+.bun *{transform-box:view-box}
+.bun .shadow{fill:#000;opacity:.13;transform-origin:60px 137.5px}
+.bun .rig{transform-origin:60px 136px}
+.bun .tail{transform-origin:86px 126px}
+.bun .belly{transform-origin:60px 119px}
+.bun .hd{transform-origin:60px 104px}
+.bun .el{transform-origin:47px 56px}.bun .er{transform-origin:73px 56px}
+.bun .face{transform-origin:60px 72px}
+.bun .cheeks{transform-origin:60px 83px}
+.bun .eyes,.bun .eyes-sq,.bun .blink{transform-origin:60px 74px}
+.bun .mouth{transform-origin:60px 82px}
+.bun .bxcheek{transform-box:fill-box;transform-origin:center}
+.bun .pwl{transform-origin:37px 106px;transform:rotate(var(--aL,20deg))}
+.bun .pwr{transform-origin:83px 106px;transform:rotate(var(--aR,-20deg))}
+.bun .pw{transition:transform .5s var(--bn-spr)}
+.bun .eyes-sq,.bun.poke .eyes{display:none}.bun.poke .eyes-sq{display:inline}
+.bun .hat{transform-origin:60px 36px}
+/* poses (arm angles); hero states override these vars so arms glide between poses */
+.p-idle{--aL:20deg;--aR:-20deg}.p-wave{--aL:20deg;--aR:-140deg}.p-cheer{--aL:152deg;--aR:-152deg}
+.p-hug{--aL:-78deg;--aR:78deg}.p-nibble{--aL:-150deg;--aR:150deg}.p-pat{--aL:20deg;--aR:72deg}
+.bun.wv{--aR:-140deg}
+.bun.puffed .cheeks{scale:1.3 1.22}
+
+/* decor: hidden until its animation runs */
+.bun .fx-h,.bun .fx-s,.bun .fx-z,.bun .fx-k,.bun .fx-pk{opacity:0;transform-box:fill-box;transform-origin:center}
+.bun .fx-h{animation:bnHeart 2.8s ease-out var(--fd,0s) infinite}
+.bun .fx-s{animation:bnSpark 1.9s var(--bn-io) var(--fd,0s) infinite}
+.bun .fx-z{animation:bnZ 3.6s var(--bn-in) var(--fd,0s) infinite;transform-box:fill-box}
+.bun .fx-k{animation:bnConf 1.9s linear var(--fd,0s) infinite}
+.bun .fx-b{transform-box:fill-box;transform-origin:15% 100%;animation:bnPulse 2s var(--bn-io) infinite}
+.bun .fx-beat{transform-box:fill-box;transform-origin:center;animation:bnBeat 1.9s var(--bn-io) infinite}
+.bun .fx-sp{animation:none}.bun.spark .fx-sp{animation:bnSpark .9s var(--bn-io) var(--fd,0s) 1}
+.bun .fx-rip,.bun .fx-bubs,.bun .fx-win,.bun .fx-cr{display:none}
+.bun .fx-rip ellipse{fill:none;stroke:#fff;stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center}
+.bun .fx-bubs circle{fill:rgba(255,255,255,.2);stroke:rgba(255,255,255,.9);stroke-width:1.4;opacity:0;transform-box:fill-box;transform-origin:center}
+.bun .fx-cr rect{opacity:0}
+
+/* the shared blob-mood eye rule (.ey) must not touch the bunny's eyes */
+.bun .ey{animation:none;transform-box:view-box}
+
+/* ===== 17. idle everywhere (random phase per bunny via --d; blink/twitch fired by bunny.js) ===== */
+.bun .rig{animation:bnBreath 3.8s var(--bn-io) var(--d,0s) infinite}
+.bun .hd{animation:bnNod 7.6s var(--bn-io) var(--d,0s) infinite}
+.bun .el{animation:bnEL 3.8s var(--bn-io) var(--d,0s) infinite}
+.bun .er{animation:bnER 3.8s var(--bn-io) calc(var(--d,0s) + .14s) infinite}
+.bun .tail{animation:bnTail 4.6s var(--bn-io) var(--d,0s) infinite}
+.bun.bk .blink{animation:bnBlink .19s var(--bn-io)}
+.bun.twl .el{animation:bnTwL .65s var(--bn-io)}.bun.twr .er{animation:bnTwR .65s var(--bn-io)}
+@keyframes bnBreath{0%,100%{scale:1 1}24%,42%{scale:1.024 .972}}
+@keyframes bnNod{0%,100%{rotate:0deg;translate:0 0}40%{rotate:1.3deg;translate:0 -.5px}72%{rotate:-.9deg;translate:0 .3px}}
+@keyframes bnEL{0%,100%{rotate:0deg}30%{rotate:-2.6deg}58%{rotate:1.2deg}}
+@keyframes bnER{0%,100%{rotate:0deg}30%{rotate:2.6deg}58%{rotate:-1.2deg}}
+@keyframes bnTail{0%,58%,100%{rotate:0deg}64%{rotate:14deg}71%{rotate:-10deg}79%{rotate:6deg}88%{rotate:0deg}}
+@keyframes bnBlink{0%,100%{scale:1 1}50%{scale:1 .08}}
+@keyframes bnTwL{0%,100%{rotate:0deg}28%{rotate:-17deg}52%{rotate:4deg}76%{rotate:-3deg}}
+@keyframes bnTwR{0%,100%{rotate:0deg}28%{rotate:17deg}52%{rotate:-4deg}76%{rotate:3deg}}
+
+/* ===== 3. header bubble (tiny, mood from done ratio) ===== */
+.bx-sleepy .rig{animation:bnSleepB 5.6s var(--bn-io) var(--d,0s) infinite}
+.bx-sleepy .el{transform:rotate(-13deg);animation:none}.bx-sleepy .er{transform:rotate(13deg);animation:none}
+.bx-sleepy .hd{animation:bnNodSl 6s var(--bn-io) var(--d,0s) infinite}
+@keyframes bnSleepB{0%,100%{scale:1 1}50%{scale:1.04 .95}}
+@keyframes bnNodSl{0%,100%{rotate:-1deg}50%{rotate:3.5deg;translate:0 1px}}
+.bx-hop{animation:bnHopC 2.6s var(--bn-io) var(--d,0s) infinite}
+.bx-hop .el{animation:bnHopEL 2.6s var(--bn-io) var(--d,0s) infinite}.bx-hop .er{animation:bnHopER 2.6s var(--bn-io) var(--d,0s) infinite}
+@keyframes bnHopC{0%,50%{translate:0 0;scale:1 1}60%{translate:0 0;scale:1.07 .9}72%{translate:0 -11%;scale:.95 1.08}84%{translate:0 0;scale:1.06 .93}92%{translate:0 -1.5%;scale:.99 1.01}100%{translate:0 0;scale:1 1}}
+@keyframes bnHopEL{0%,58%{rotate:0deg}74%{rotate:-16deg}86%{rotate:8deg}95%,100%{rotate:0deg}}
+@keyframes bnHopER{0%,58%{rotate:0deg}74%{rotate:16deg}86%{rotate:-8deg}95%,100%{rotate:0deg}}
+.top .bx-love{animation:bnLoveB 2.2s var(--bn-io) var(--d,0s) infinite}
+@keyframes bnLoveB{0%,100%{scale:1}14%{scale:1.07 1.05}28%{scale:1}42%{scale:1.05}60%{scale:1}}
+.bx-excite{animation:bnExcB .9s var(--bn-io) var(--d,0s) infinite}
+.bx-excite .el{animation:bnFlapL .45s var(--bn-io) infinite}.bx-excite .er{animation:bnFlapR .45s var(--bn-io) infinite}
+@keyframes bnExcB{0%,100%{translate:0 0;scale:1 1}32%{translate:0 -13%;scale:.96 1.07}58%{translate:0 0;scale:1.07 .92}78%{translate:0 -2%;scale:1}}
+@keyframes bnFlapL{0%,100%{rotate:0deg}50%{rotate:-11deg}}@keyframes bnFlapR{0%,100%{rotate:0deg}50%{rotate:11deg}}
+.top .bx-party{animation:bnPartyB 2.6s var(--bn-io) var(--d,0s) infinite}
+.bx-party .el{animation:bnFlapL .5s var(--bn-io) infinite}.bx-party .er{animation:bnFlapR .5s var(--bn-io) infinite}
+.bx-party .pw{animation:bnCheerArm .5s var(--bn-io) infinite}.bx-party .pwr{animation-delay:.25s}
+@keyframes bnPartyB{0%,20%{translate:0 0;scale:1 1;rotate:0deg}32%{scale:1.09 .88}50%{translate:0 -13%;scale:.95 1.08}74%{translate:0 -10%;rotate:-5deg}88%{translate:0 0;scale:1.07 .92;rotate:0deg}100%{translate:0 0;scale:1 1}}
+@keyframes bnCheerArm{0%,100%{rotate:0deg}50%{rotate:-14deg}}
+/* tap reaction (replaces wiggle/.bx-poke): little jump + squint + heart */
+.bun.poke{animation:bnPoke .6s var(--bn-out)}
+.bun.poke .fx-pk{animation:bnPkHeart .85s ease-out both}
+@keyframes bnPoke{0%{scale:1 1}18%{translate:0 0;scale:1.1 .86}46%{translate:0 -16%;scale:.94 1.1}72%{translate:0 0;scale:1.08 .92}100%{translate:0 0;scale:1 1}}
+@keyframes bnPkHeart{0%{opacity:0;translate:0 6px;scale:.4}25%{opacity:1}100%{opacity:0;translate:4px -22px;scale:1.1}}
+
+/* ===== 4. avatar() + profile card avatar: calm pride ===== */
+.bx-av,.bx-card{animation:bnPopIn .55s var(--bn-spr) both}
+@keyframes bnPopIn{from{scale:.6;opacity:0}to{scale:1;opacity:1}}
+.bx-card.wv .pwr,.bx-av.wv .pwr{animation:bnWaveArm .55s var(--bn-io) 3}
+
+/* ===== 5. profile sheet preview ===== */
+.bx-preview{animation:bnBounceIn .75s var(--bn-spr) both}
+.bx-preview.shim{animation:bnShim .6s var(--bn-io)}
+@keyframes bnBounceIn{0%{scale:.4 .4;translate:0 30%;opacity:0}45%{scale:1.1 .9;translate:0 -6%;opacity:1}70%{scale:.97 1.04;translate:0 0}100%{scale:1 1;translate:0 0;opacity:1}}
+@keyframes bnShim{0%{scale:1;rotate:0deg}28%{scale:1.14 .92;rotate:-6deg}52%{scale:.97 1.06;rotate:5deg}76%{scale:1.03;rotate:-2deg}100%{scale:1;rotate:0deg}}
+
+/* ===== 6. onboarding welcome: pops out of the sticker, waves, hearts ===== */
+.bx-welcome{animation:bnPopOut 1s var(--bn-spr) both}
+.bx-welcome .pwr{animation:bnWaveArm .6s var(--bn-io) 1s 4}
+@keyframes bnPopOut{0%{translate:0 75%;scale:.55;opacity:0}55%{translate:0 -9%;scale:1.05 1.08;opacity:1}78%{translate:0 2%;scale:1.02 .97}100%{translate:0 0;scale:1;opacity:1}}
+@keyframes bnWaveArm{0%,100%{rotate:0deg}50%{rotate:-24deg}}
+
+/* ===== 7. onboarding buddyName: curious tilts + wave on first appear ===== */
+.bx-name .hd{animation:bnTilt 5.2s var(--bn-io) var(--d,0s) infinite}
+.bx-name .pwr{animation:bnWaveArm .55s var(--bn-io) .2s 3}
+.bx-name{animation:bnPopIn .5s var(--bn-spr) both}
+@keyframes bnTilt{0%,50%,100%{rotate:0deg;translate:0 0}60%{rotate:-9deg;translate:-2px 0}76%{rotate:7deg;translate:2px 0}90%{rotate:0deg}}
+
+/* ===== 8. onboarding look: little bunny in the speech row talks ===== */
+.bx-talk .mouth{animation:bnTalkM 2.8s var(--bn-io) var(--d,0s) infinite}
+.bx-talk .rig{animation:bnTalkB 2.8s var(--bn-io) var(--d,0s) infinite}
+@keyframes bnTalkM{0%,60%,100%{scale:1 .3}6%{scale:1.05 1.15}12%{scale:1 .35}18%{scale:1.05 1.05}24%{scale:1 .3}30%{scale:1.05 1.2}37%{scale:1 .3}43%{scale:1.05 .95}50%{scale:1 .3}}
+@keyframes bnTalkB{0%,60%,100%{translate:0 0;scale:1 1}6%,18%,30%,43%{translate:0 -2%;scale:.99 1.02}12%,24%,37%,50%{translate:0 .5%;scale:1.02 .98}}
+
+/* ===== 9. onboarding account: large relaxed float, breathing shadow ===== */
+.bx-acct{animation:bnFloat 6.4s var(--bn-io) infinite}
+.bx-acct .shadow{animation:bnShadowF 6.4s var(--bn-io) infinite}
+.bx-acct .el{animation:bnEarPulseL 3.2s var(--bn-io) infinite}.bx-acct .er{animation:bnEarPulseR 3.2s var(--bn-io) -.9s infinite}
+.bx-acct .bxcheek{animation:bnCheekPulse 3.2s var(--bn-io) infinite}
+@keyframes bnFloat{0%,100%{translate:0 0;rotate:0deg}25%{translate:2.4% -3.6%;rotate:2deg}50%{translate:0 -6.5%;rotate:0deg}75%{translate:-2.4% -3.6%;rotate:-2deg}}
+@keyframes bnShadowF{0%,100%{scale:1;opacity:.13}50%{scale:.78 .8;opacity:.07}}
+@keyframes bnEarPulseL{0%,100%{rotate:-4deg}50%{rotate:4deg}}@keyframes bnEarPulseR{0%,100%{rotate:4deg}50%{rotate:-4deg}}
+@keyframes bnCheekPulse{0%,100%{scale:1;opacity:.75}50%{scale:1.22;opacity:1}}
+
+/* ===== 10. onboarding ready: the big celebration ===== */
+.bx-ready{animation:bnReady 2.7s var(--bn-io) .2s 1 both,bnProud 3.6s var(--bn-io) 3s infinite}
+.bx-ready .pw{animation:bnCheerArm .5s var(--bn-io) 3 .6s}.bx-ready .pwr{animation-delay:.85s}
+.bx-ready .hat{animation:bnHatBob .5s var(--bn-io) 4 .5s}
+@keyframes bnReady{0%{translate:0 0;scale:1;rotate:0deg}14%{scale:1.12 .82}30%{translate:0 -4%;scale:.9 1.16}52%{translate:0 -30%;scale:.97 1.05;rotate:180deg}68%{translate:0 -16%;scale:1;rotate:360deg}80%{translate:0 0;scale:1.14 .84;rotate:360deg}90%{translate:0 -3%;scale:.98 1.03;rotate:360deg}100%{translate:0 0;scale:1;rotate:360deg}}
+@keyframes bnProud{0%,100%{rotate:0deg;scale:1}50%{rotate:2deg;scale:1.03 1.04}}
+@keyframes bnHatBob{0%,100%{rotate:0deg}50%{rotate:-7deg}}
+
+/* ===== 11. perfect-day overlay (.hop): cheer rises, wobbles, fades ===== */
+.hop{position:fixed;left:50%;bottom:120px;margin-left:-28px;z-index:450;pointer-events:none;animation:bnPerfect 1s var(--bn-out) forwards}
+.bx-perfect .pw{animation:bnCheerArm .35s var(--bn-io) infinite}
+@keyframes bnPerfect{0%{translate:0 20px;scale:.5;opacity:0}16%{translate:0 0;scale:1.12;opacity:1}45%{translate:0 -80px;rotate:-7deg}70%{translate:0 -118px;rotate:6deg;opacity:1}100%{translate:0 -160px;rotate:0deg;scale:1;opacity:0}}
+
+/* ===== 12. empty state .emp-b: gentle talk, invite tilt, one-time wave ===== */
+.bx-empty .mouth{animation:bnTalkSoft 3.6s var(--bn-io) var(--d,0s) infinite}
+.bx-empty .hd{animation:bnInvite 4.8s var(--bn-io) var(--d,0s) infinite}
+.bx-empty .pwr{animation:bnWaveArm .6s var(--bn-io) .5s 2}
+@keyframes bnTalkSoft{0%,45%,100%{scale:1 .55}8%{scale:1 1.1}16%{scale:1 .6}24%{scale:1 1}32%{scale:1 .55}}
+@keyframes bnInvite{0%,100%{rotate:0deg}30%{rotate:-6deg}60%{rotate:-6deg}80%{rotate:0deg}}
+
+/* ===== 13. partner tab, not linked: waiting, looks left/right, blush pulse, sigh ===== */
+.bx-wait .hd{animation:bnLookHd 8s var(--bn-io) infinite}
+.bx-wait .face{animation:bnLookFace 8s var(--bn-io) infinite}
+.bx-wait .rig{animation:bnSigh 9s var(--bn-io) var(--d,0s) infinite}
+.bx-wait .bxcheek{animation:bnBlush 2.6s var(--bn-io) infinite}
+@keyframes bnLookHd{0%,12%,52%,100%{rotate:0deg}22%,38%{rotate:-5deg}62%,78%{rotate:5deg}}
+@keyframes bnLookFace{0%,12%,52%,100%{translate:0 0}22%,38%{translate:-6px 0}62%,78%{translate:6px 0}}
+@keyframes bnSigh{0%,72%,100%{scale:1 1}80%{scale:1.05 1.04;translate:0 -1%}90%{scale:1.03 .94;translate:0 0}}
+@keyframes bnBlush{0%,100%{scale:1;opacity:.8}50%{scale:1.35;opacity:1}}
+
+/* ===== 14. partner tab, linked card + cheer hop ===== */
+.bx-partner{animation:bnPopIn .5s var(--bn-spr) both}
+.bx-partner .bxcheek{animation:bnBlush 3.4s var(--bn-io) infinite}
+.bx-cheered{animation:bnCheerHop .8s var(--bn-io) both}
+.bx-cheered .fx-h{animation:bnHeartBurst .9s ease-out var(--fd,0s) both}
+@keyframes bnCheerHop{0%{translate:0 0;scale:1}20%{scale:1.1 .86}45%{translate:0 -24%;scale:.94 1.12;rotate:-6deg}68%{translate:0 0;scale:1.1 .9;rotate:4deg}84%{translate:0 -3%;scale:1;rotate:0deg}100%{translate:0 0;scale:1}}
+@keyframes bnHeartBurst{0%{opacity:0;translate:0 0;scale:.3}25%{opacity:1}100%{opacity:0;translate:0 -36px;scale:1.2}}
+
+/* ===== 15. splash ===== */
+.bx-splash{animation:bnBob 1.3s var(--bn-io) infinite alternate}
+.bx-splash .shadow{animation:bnShadowB 1.3s var(--bn-io) infinite alternate}
+.bx-splash .blink{animation:bnBlink 2.4s var(--bn-io) .5s infinite}
+@keyframes bnBob{to{translate:0 -5%}}@keyframes bnShadowB{to{scale:.82;opacity:.08}}
+
+/* ===== 1. WATER HERO (care tab). Root animates; --aL/--aR glide the arms between poses ===== */
+.chero .bx-water,.chero .bx-meal{will-change:translate,rotate,scale}
+.chero .bx-water .rig{animation-duration:3.2s}
+.chero[data-st] .bx-water{animation:bnSettle .6s var(--bn-spr)}
+/* dry: anticipation crouch, stretch at peak, squash on landing, ears flop late, tail wiggle, pant */
+.chero[data-st=dry] .bx-water{animation:bnDryHop 2.9s cubic-bezier(.4,0,.2,1) infinite,bnSettle .6s var(--bn-spr)}
+.chero[data-st=dry] .bx-water .el{animation:bnEarDryL 2.9s cubic-bezier(.4,0,.2,1) .1s infinite}
+.chero[data-st=dry] .bx-water .er{animation:bnEarDryR 2.9s cubic-bezier(.4,0,.2,1) .13s infinite}
+.chero[data-st=dry] .bx-water .tail{animation:bnTailLand 2.9s var(--bn-io) infinite}
+.chero[data-st=dry] .bx-water .mouth{animation:bnPant 2.9s var(--bn-io) infinite}
+.chero[data-st=dry] .bx-water .rig{animation:none}
+@keyframes bnDryHop{0%,28%{translate:0 0;scale:1 1}38%{translate:0 0;scale:1.1 .84}52%{translate:0 -24%;scale:.93 1.14}62%{translate:0 -26%;scale:.97 1.04}74%{translate:0 0;scale:1.13 .85}82%{translate:0 -4%;scale:.98 1.03}91%{translate:0 0;scale:1.03 .97}100%{translate:0 0;scale:1 1}}
+@keyframes bnEarDryL{0%,36%{rotate:0deg}44%{rotate:7deg}58%{rotate:-22deg}72%{rotate:6deg}84%{rotate:-9deg}93%{rotate:2deg}100%{rotate:0deg}}
+@keyframes bnEarDryR{0%,36%{rotate:0deg}44%{rotate:-7deg}58%{rotate:22deg}72%{rotate:-6deg}84%{rotate:9deg}93%{rotate:-2deg}100%{rotate:0deg}}
+@keyframes bnTailLand{0%,72%,100%{rotate:0deg}76%{rotate:22deg}82%{rotate:-18deg}88%{rotate:10deg}94%{rotate:-4deg}}
+@keyframes bnPant{0%,6%,22%,100%{scale:1 1}10%,16%{scale:1.1 1.7}}
+/* swim: floats on the surface, paddling paws, ears trail each bob, ripple ring */
+.chero[data-st=swim] .bx-water{--aL:40deg;--aR:-40deg;animation:bnSwim 2.4s var(--bn-io) infinite,bnSettle .6s var(--bn-spr)}
+.chero[data-st=swim] .bx-water .pwl{animation:bnPaddleL .8s var(--bn-io) infinite}
+.chero[data-st=swim] .bx-water .pwr{animation:bnPaddleR .8s var(--bn-io) .4s infinite}
+.chero[data-st=swim] .bx-water .el{animation:bnEarTrailL 2.4s var(--bn-io) .2s infinite}
+.chero[data-st=swim] .bx-water .er{animation:bnEarTrailR 2.4s var(--bn-io) .2s infinite}
+.chero[data-st=swim] .bx-water .fx-rip{display:block}
+.chero[data-st=swim] .bx-water .fx-rip ellipse{animation:bnRipple 2.4s ease-out infinite}
+.chero[data-st=swim] .bx-water .fx-rip .r2{animation-delay:1.2s}
+@keyframes bnSwim{0%,100%{translate:0 0;rotate:-1.6deg}50%{translate:0 -4%;rotate:1.6deg}}
+@keyframes bnPaddleL{0%,100%{rotate:0deg}50%{rotate:-34deg}}@keyframes bnPaddleR{0%,100%{rotate:0deg}50%{rotate:34deg}}
+@keyframes bnEarTrailL{0%,100%{rotate:3deg}50%{rotate:-8deg}}@keyframes bnEarTrailR{0%,100%{rotate:-3deg}50%{rotate:8deg}}
+@keyframes bnRipple{0%{scale:.55 .55;opacity:.7}100%{scale:1.5 1.5;opacity:0}}
+/* under: calm slow drift, ears float up and sway, puffed cheeks, bubbles from the mouth */
+.chero[data-st=under] .bx-water{--aL:44deg;--aR:-44deg;animation:bnDrift 6.4s var(--bn-io) infinite,bnSettle .6s var(--bn-spr)}
+.chero[data-st=under] .bx-water .pw{animation:bnPaddleSlow 3.2s var(--bn-io) infinite}.chero[data-st=under] .bx-water .pwr{animation-delay:-1.6s}
+.chero[data-st=under] .bx-water .el{transform:rotate(-12deg);animation:bnEarSwayL 3.6s var(--bn-io) infinite}
+.chero[data-st=under] .bx-water .er{transform:rotate(12deg);animation:bnEarSwayR 3.6s var(--bn-io) -1.8s infinite}
+.chero[data-st=under] .bx-water .rig{animation-duration:5.4s}
+.chero[data-st=under] .bx-water .fx-bubs{display:block}
+.chero[data-st=under] .bx-water .fx-bubs circle{animation:bnBubUp 2.8s ease-in infinite}
+.chero[data-st=under] .bx-water .fx-bubs .b2{animation-delay:.9s}.chero[data-st=under] .bx-water .fx-bubs .b3{animation-delay:1.8s}
+@keyframes bnDrift{0%,100%{translate:0 0;rotate:-2deg}30%{translate:3% -4%;rotate:1.5deg}62%{translate:-3% -1.5%;rotate:3deg}}
+@keyframes bnPaddleSlow{0%,100%{rotate:0deg}50%{rotate:-16deg}}
+@keyframes bnEarSwayL{0%,100%{rotate:-8deg}50%{rotate:9deg}}@keyframes bnEarSwayR{0%,100%{rotate:8deg}50%{rotate:-9deg}}
+@keyframes bnBubUp{0%{opacity:0;translate:0 0;scale:.5}15%{opacity:1}100%{opacity:0;translate:4px -46px;scale:1.2}}
+/* full: arms up, happy spin with ease-out settle, hearts + sparkles, belly bounce, then a content sway */
+.chero[data-st=full] .bx-water{transform-origin:50% 62%;animation:bnFullDance 6.2s var(--bn-io) infinite,bnSettle .6s var(--bn-spr)}
+.chero[data-st=full] .bx-water .belly{animation:bnBelly 1.1s var(--bn-io) infinite}
+.chero[data-st=full] .bx-water .pw{animation:bnCheerArm .55s var(--bn-io) infinite}.chero[data-st=full] .bx-water .pwr{animation-delay:.27s}
+.chero[data-st=full] .bx-water .el{animation:bnFlapL .9s var(--bn-io) infinite}.chero[data-st=full] .bx-water .er{animation:bnFlapR .9s var(--bn-io) infinite}
+.chero[data-st=full] .bx-water .fx-win{display:block}
+.chero[data-st=full] .bx-water .fx-win .fx-h{animation-duration:2.2s}
+@keyframes bnFullDance{0%{translate:0 0;rotate:0deg;scale:1}10%{scale:1.1 .86}22%{translate:0 -8%;scale:.93 1.12}38%{translate:0 -12%;rotate:200deg;scale:1.06}56%{translate:0 -3%;rotate:350deg;scale:1.02}64%{translate:0 0;rotate:362deg;scale:1.1 .88}72%{translate:0 0;rotate:358deg;scale:1}78%,100%{rotate:360deg}84%{translate:0 -2%;rotate:363deg}92%{translate:0 0;rotate:357deg}}
+@keyframes bnBelly{0%,100%{scale:1}50%{scale:1.14 1.1}}
+@keyframes bnSettle{from{scale:.94 1.06}to{scale:1 1}}
+
+/* ===== 2. MEAL HERO (speed scales with --mp) ===== */
+.chero[data-ms] .bx-meal{animation:bnSettle .6s var(--bn-spr)}
+/* hungry: droopy ears, rumbling belly wobble, sad face */
+.chero[data-ms=hungry] .bx-meal .el{transform:rotate(-17deg);animation:none}.chero[data-ms=hungry] .bx-meal .er{transform:rotate(17deg);animation:none}
+.chero[data-ms=hungry] .bx-meal .belly{animation:bnRumble 2.8s var(--bn-io) infinite}
+.chero[data-ms=hungry] .bx-meal .rig{animation:bnHungryB 4.6s var(--bn-io) infinite}
+@keyframes bnRumble{0%,58%,100%{scale:1;translate:0 0}62%{scale:1.12 1.04;translate:-1px 0}66%{scale:1.04 1;translate:1px 0}70%{scale:1.14 1.06;translate:-1px 0}74%{scale:1.04 1;translate:1px 0}80%{scale:1.1 1.04;translate:0 0}}
+@keyframes bnHungryB{0%,100%{scale:1.01 .985;rotate:-.8deg}50%{scale:1 1;rotate:.8deg}}
+/* nibble: tiny quick chews, paws held at the mouth */
+.chero[data-ms=nibble] .bx-meal{--aL:-150deg;--aR:150deg}
+.chero[data-ms=nibble] .bx-meal .mouth{animation:bnChew calc(1.1s - var(--mp,0)*.5s) var(--bn-io) infinite}
+.chero[data-ms=nibble] .bx-meal .pw{animation:bnPawChew calc(1.1s - var(--mp,0)*.5s) var(--bn-io) infinite}
+.chero[data-ms=nibble] .bx-meal .hd{animation:bnChewHd calc(1.1s - var(--mp,0)*.5s) var(--bn-io) infinite}
+.chero[data-ms=nibble] .bx-meal .el{animation:bnEarSwayL calc(2.2s - var(--mp,0)*.8s) var(--bn-io) infinite}
+.chero[data-ms=nibble] .bx-meal .er{animation:bnEarSwayR calc(2.2s - var(--mp,0)*.8s) var(--bn-io) infinite}
+/* eat: bigger chews, bulging cheeks, crumbs */
+.chero[data-ms=eat] .bx-meal{--aL:-150deg;--aR:150deg}
+.chero[data-ms=eat] .bx-meal .cheeks{scale:1.32 1.24}
+.chero[data-ms=eat] .bx-meal .mouth{animation:bnChewBig calc(.8s - var(--mp,0)*.35s) var(--bn-io) infinite}
+.chero[data-ms=eat] .bx-meal .bxcheek{animation:bnCheekChew calc(.8s - var(--mp,0)*.35s) var(--bn-io) infinite}
+.chero[data-ms=eat] .bx-meal .pw{animation:bnPawChew calc(.8s - var(--mp,0)*.35s) var(--bn-io) infinite}
+.chero[data-ms=eat] .bx-meal .hd{animation:bnChewHd calc(.8s - var(--mp,0)*.35s) var(--bn-io) infinite}
+.chero[data-ms=eat] .bx-meal .rig{animation:bnEatB calc(.8s - var(--mp,0)*.35s) var(--bn-io) infinite}
+.chero[data-ms=eat] .bx-meal .fx-cr{display:block}
+.chero[data-ms=eat] .bx-meal .fx-cr rect{animation:bnCrumb calc(1.6s - var(--mp,0)*.7s) ease-out var(--cd,0s) infinite}
+/* full: content belly pat, floaty smile */
+.chero[data-ms=full] .bx-meal{--aR:72deg;animation:bnFloatSm 3s var(--bn-io) infinite,bnSettle .6s var(--bn-spr)}
+.chero[data-ms=full] .bx-meal .pwr{animation:bnPatArm .9s var(--bn-io) infinite}
+.chero[data-ms=full] .bx-meal .belly{animation:bnBelly 1.8s var(--bn-io) infinite}
+.chero[data-ms=full] .bx-meal .el{transform:rotate(-6deg);animation:bnEarSwayL 3s var(--bn-io) infinite}
+.chero[data-ms=full] .bx-meal .er{transform:rotate(6deg);animation:bnEarSwayR 3s var(--bn-io) -1.5s infinite}
+.chero[data-ms=full] .bx-meal .fx-win{display:block}
+@keyframes bnChew{0%,100%{scale:1 .5}50%{scale:1.1 1.15}}
+@keyframes bnChewBig{0%,100%{scale:1 .4}50%{scale:1.2 1.4}}
+@keyframes bnPawChew{0%,100%{rotate:0deg}50%{rotate:-8deg}}
+@keyframes bnChewHd{0%,100%{rotate:0deg;translate:0 0}50%{rotate:1.2deg;translate:0 1px}}
+@keyframes bnEatB{0%,100%{scale:1 1}50%{scale:1.03 .965}}
+@keyframes bnCheekChew{0%,100%{scale:1}50%{scale:1.16 1.1}}
+@keyframes bnCrumb{0%{opacity:1;translate:0 0;scale:1}100%{opacity:0;translate:var(--x) var(--y);scale:.4}}
+@keyframes bnFloatSm{0%,100%{translate:0 0;rotate:-1deg}50%{translate:0 -4%;rotate:1.5deg}}
+@keyframes bnPatArm{0%,100%{rotate:0deg}50%{rotate:-9deg}}
+/* .go on log: munch squash + crumb burst */
+.chero .mbun.go .bx-meal{animation:bnMunch .45s var(--bn-io) 2}
+.chero .mbun.go .bx-meal .fx-cr{display:block}
+.chero .mbun.go .bx-meal .fx-cr rect{animation:bnCrumb .8s ease-out var(--cd,0s) both}
+@keyframes bnMunch{0%,100%{translate:0 0;scale:1 1}50%{translate:0 2%;scale:1.09 .9}}
+
+/* ===== shared keyframes: decor ===== */
+@keyframes bnHeart{0%{opacity:0;translate:0 0;scale:.4;rotate:-12deg}20%{opacity:1}100%{opacity:0;translate:4px -38px;scale:1.1;rotate:14deg}}
+@keyframes bnSpark{0%,100%{opacity:0;scale:.2;rotate:0deg}50%{opacity:1;scale:1;rotate:45deg}}
+@keyframes bnZ{0%{opacity:0;translate:0 0;scale:.6}20%{opacity:.95}100%{opacity:0;translate:12px -30px;scale:1.2}}
+@keyframes bnConf{0%{opacity:0;translate:0 0;rotate:0deg}10%{opacity:1}100%{opacity:0;translate:var(--dx,0px) 74px;rotate:300deg}}
+@keyframes bnPulse{0%,100%{scale:1}50%{scale:1.08}}
+@keyframes bnBeat{0%,100%{scale:1}14%{scale:1.3}28%{scale:1}42%{scale:1.3}56%{scale:1}}
+@keyframes bnChipHop{0%,100%{translate:0 0;scale:1}35%{translate:0 -12%;scale:.96 1.07}60%{translate:0 0;scale:1.07 .93}}
+
+/* ===== rules: pause + reduced motion ===== */
+/* tab hidden (bunny.js toggles html.bn-bg) or bunny off-screen (bunny.js toggles .off) */
+html.bn-bg .bun,html.bn-bg .bun *,.bun.off,.bun.off *{animation-play-state:paused!important}
+/* reduced motion, all three mechanisms: static, nicely posed, no blinking; state still reads from face + pose */
+.rm .bun,.rm .bun *,html.rm .bun,html.rm .bun *,.rm .hop,html.rm .hop,.rm .bnchip,html.rm .bnchip{animation:none!important;transition:none!important}
+.rm .bun .fx-h,.rm .bun .fx-s{opacity:1}.rm .bun .fx-z{opacity:.85}
+@media (prefers-reduced-motion:reduce){
+.bun,.bun *,.hop,.bnchip{animation:none!important;transition:none!important}
+.bun .fx-h,.bun .fx-s{opacity:1}.bun .fx-z{opacity:.85}
+}
